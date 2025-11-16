@@ -1,6 +1,9 @@
 function App() {
   return (
-    <h1>Docker Test Successful!</h1>
+    <div className="container mt-3 text-center">
+      <h2>Docker Test Successful!</h2>
+
+    </div>
   );
 }
 export default App;
