@@ -1,0 +1,44 @@
+name: Deploy React App to Server via Docker (Password Auth)
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Upload Code to Server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: "."
+          target: "/home/${{ secrets.SERVER_USER }}/react-test"
+
+      - name: SSH Into Server and Deploy
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /home/${{ secrets.SERVER_USER }}/react-test
+
+            echo "Stopping old containers..."
+            docker stop $(docker ps -q) || true
+
+            echo "Removing old containers..."
+            docker rm $(docker ps -aq) || true
+
+            echo "Building Docker image..."
+            docker build -t react-test .
+
+            echo "Running new Docker container..."
+            docker run -d -p 3000:3000 react-test
