@@ -41,4 +41,4 @@ jobs:
             docker build -t react-test .
 
             echo "Running new Docker container..."
-            docker run -d -p 3000:3000 react-test
+            docker run -d -p 5051:3000 react-test
